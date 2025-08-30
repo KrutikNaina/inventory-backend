@@ -34,15 +34,15 @@ passport.use(
           });
         }
 
-        // Generate JWT
+        // Generate JWT token
         const token = jwt.sign(
           { id: user._id, name: user.name, email: user.email, role: user.role },
           process.env.JWT_SECRET,
           { expiresIn: "7d" }
         );
 
-        user.token = token;
-        return done(null, user);
+        // Return user and token via done
+        return done(null, { user, token });
       } catch (err) {
         return done(err, null);
       }
@@ -50,11 +50,8 @@ passport.use(
   )
 );
 
-// Serialize & Deserialize
-passport.serializeUser((user, done) => done(null, user.id));
-passport.deserializeUser(async (id, done) => {
-  const user = await User.findById(id);
-  done(null, user);
-});
+// ✅ Remove serializeUser / deserializeUser
+// JWT approach does not require session support
+
 
 export default passport;

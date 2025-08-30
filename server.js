@@ -1,52 +1,45 @@
 import express from "express";
-import mongoose from "mongoose";
 import dotenv from "dotenv";
-import session from "express-session";
-import passport from "passport";
+import cors from "cors";
+import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
-import productRoutes from "./routes/productRoutes.js";   // ✅ import here
-import stockRoutes from "./routes/stockRoutes.js"; // ✅ add this
-import orderRoutes from "./routes/orderRoutes.js"; // ✅ make sure this is correct
+import productRoutes from "./routes/productRoutes.js";
+import orderRoutes from "./routes/orderRoutes.js";
+import stockRoutes from "./routes/stockRoutes.js";
+import passport from "./config/passport.js";
 
-
-import "./config/passport.js"; // IMPORTANT: import passport config
-
+// Load env vars
 dotenv.config();
 
-const app = express();
+// Connect to DB
+connectDB();
 
-// Database connection
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error("DB error:", err));
+const app = express();
 
 // Middleware
 app.use(express.json());
 
-// Sessions
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET || "secret",
-    resave: false,
-    saveUninitialized: false,
-  })
-);
+// CORS configuration
+app.use(cors({
+  origin: "http://localhost:5173", // your frontend URL
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true
+}));
 
-// Passport
+// Initialize passport
 app.use(passport.initialize());
-app.use(passport.session());
 
 // Routes
 app.use("/auth", authRoutes);
-app.use("/api/products", productRoutes); // ✅ important!
-app.use("/api/stocklogs", stockRoutes); // ✅ mount route
-app.use("/api/orders", orderRoutes); // ✅ important
+app.use("/api/products", productRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/stock", stockRoutes);
 
-
-
+// Test route
 app.get("/", (req, res) => {
-  res.send("Home Page");
+  res.send("Smart Inventory Management Backend Running ✅");
 });
 
-app.listen(5000, () => console.log("Server running on port 5000"));
+// Start server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
