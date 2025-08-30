@@ -1,9 +1,15 @@
-import express from "express";
-import { protect } from "../middlewares/authMiddleware.js";
-import { createOrder } from "../controllers/orderController.js";
+// routes/productRoutes.js
+const express = require("express");
+const { protect } = require("../middlewares/authMiddleware");
+const { adminOnly } = require("../middlewares/roleMiddleware");
+const { addProduct, getProducts, getProductById, updateProduct, deleteProduct } = require("../controllers/productController");
 
 const router = express.Router();
 
-router.post("/", protect, createOrder); // ✅ POST /api/orders
+router.post("/", protect, adminOnly, addProduct);
+router.get("/", protect, getProducts);
+router.get("/:id", protect, getProductById);
+router.put("/:id", protect, adminOnly, updateProduct);
+router.delete("/:id", protect, adminOnly, deleteProduct);
 
-export default router;
+module.exports = router;

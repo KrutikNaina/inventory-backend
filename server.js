@@ -7,6 +7,8 @@ import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import stockRoutes from "./routes/stockRoutes.js";
 import passport from "./config/passport.js";
+// import aiReportRoute from "./routes/aiReport.js"; // add this
+
 
 // Load env vars
 dotenv.config();
@@ -31,6 +33,7 @@ app.use(passport.initialize());
 
 // Routes
 app.use("/auth", authRoutes);
+// app.use("/api", aiReportRoute);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/stock", stockRoutes);

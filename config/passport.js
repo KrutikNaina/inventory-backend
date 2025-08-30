@@ -23,7 +23,7 @@ passport.use(
 
         if (!user) {
           // Assign role based on email
-          const role = profile.emails[0].value === "nenakrutik2004@gmail.com" ? "admin" : "staff";
+          const role = profile.emails[0].value === "nenakrutik2004@gmail.com" ? "Admin" : "staff";
 
           user = await User.create({
             googleId: profile.id,
