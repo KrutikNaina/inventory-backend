@@ -1,79 +1,27 @@
 import express from "express";
 import passport from "passport";
-import jwt from "jsonwebtoken";
-import { register, login, getMe } from "../controllers/authController.js";
 
 const router = express.Router();
 
-// ---------------- GOOGLE ----------------
+// Login with Google
 router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
 
+// Callback after Google login
 router.get(
   "/google/callback",
-  passport.authenticate("google", { failureRedirect: "/auth/failure" }),
+  passport.authenticate("google", { failureRedirect: "/login" }),
   (req, res) => {
-    const token = jwt.sign(
-      {
-        id: req.user._id,
-        name: req.user.name,
-        email: req.user.email,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    res.send(`
-      <html><body>
-        <script>
-          window.opener.postMessage({
-            type: 'oauth-success',
-            token: '${token}'
-          }, 'http://localhost:5173');
-          window.close();
-        </script>
-      </body></html>
-    `);
+    // Successful login
+    res.redirect("/dashboard"); // change this to your frontend/dashboard
   }
 );
 
-// ---------------- GITHUB ----------------
-router.get("/github", passport.authenticate("github"));
-
-router.get(
-  "/github/callback",
-  passport.authenticate("github", { failureRedirect: "/auth/failure" }),
-  (req, res) => {
-    const token = jwt.sign(
-      {
-        id: req.user._id,
-        name: req.user.name,
-        email: req.user.email,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    res.send(`
-      <html><body>
-        <script>
-          window.opener.postMessage({
-            type: 'oauth-success',
-            token: '${token}'
-          }, 'http://localhost:5173');
-          window.close();
-        </script>
-      </body></html>
-    `);
-  }
-);
-
-// ---------------- LOCAL AUTH ----------------
-router.post("/register", register);
-router.post("/login", login);
-router.get("/me", getMe);
-
-router.get("/failure", (req, res) => {
-  res.send("Authentication Failed ❌");
+// Logout
+router.get("/logout", (req, res) => {
+  req.logout((err) => {
+    if (err) return res.status(500).send(err);
+    res.redirect("/");
+  });
 });
 
 export default router;
