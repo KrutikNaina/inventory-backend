@@ -1,19 +1,13 @@
-// routes/stockRoutes.js
+// backend/routes/stockRoutes.js
 const express = require("express");
-const StockLog = require("../models/StockLog");
 const { protect } = require("../middlewares/authMiddleware");
-const { adminOnly } = require("../middlewares/roleMiddleware");
+const { addStockLog, getStockLogs, getStockLogById, deleteStockLog } = require("../controllers/stockController");
 
 const router = express.Router();
 
-router.get("/", protect, adminOnly, async (req, res) => {
-  const logs = await StockLog.find().populate("productId userId orderId");
-  res.json(logs);
-});
-
-router.get("/:productId", protect, async (req, res) => {
-  const logs = await StockLog.find({ productId: req.params.productId }).populate("userId orderId");
-  res.json(logs);
-});
+router.post("/", protect, addStockLog); // Add new stock log
+router.get("/", protect, getStockLogs);  // Get all logs
+router.get("/:id", protect, getStockLogById); // Get log by ID
+router.delete("/:id", protect, deleteStockLog); // Delete log
 
 module.exports = router;
