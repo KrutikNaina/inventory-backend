@@ -2,12 +2,14 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
+import passport from "./config/passport.js";
+
+// Routes
 import authRoutes from "./routes/authRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import stockRoutes from "./routes/stockRoutes.js";
-import passport from "./config/passport.js";
-// import aiReportRoute from "./routes/aiReport.js"; // add this
+import reportRoutes from "./routes/reportRoutes.js"; // your AI report route
 
 
 // Load env vars
@@ -16,14 +18,13 @@ dotenv.config();
 // Connect to DB
 connectDB();
 
+// Initialize app
 const app = express();
 
 // Middleware
 app.use(express.json());
-
-// CORS configuration
 app.use(cors({
-  origin: "http://localhost:5173", // your frontend URL
+  origin: "http://localhost:5173", // frontend URL
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true
 }));
@@ -33,10 +34,10 @@ app.use(passport.initialize());
 
 // Routes
 app.use("/auth", authRoutes);
-// app.use("/api", aiReportRoute);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/stock", stockRoutes);
+app.use("/api/reports", reportRoutes); // ✅ must be after app is defined
 
 // Test route
 app.get("/", (req, res) => {
